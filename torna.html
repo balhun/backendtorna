@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torna</title>
+    <style>
+        body { background-color: #227B94;}
+
+        .container {
+            width: 50%;
+            margin: 0px auto;
+            margin-bottom: 30px;
+            box-shadow: 5px 10px 10px #001F3F;
+        }
+
+        .header {
+            font-size: 20pt;
+            background-color: #16325B;
+            color: white;
+            padding: 10px;
+        }
+
+        .content {
+            padding: 10px;
+            background-color: white;
+        }
+
+        .blue {
+            font-weight: bold;
+            color: blue;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+
+        async function atlag() {
+            let response = await fetch("http://localhost:88/magas?fx=atlag");
+            let json = await response.json();
+            document.getElementById("adatok").innerHTML = `Átlag magasság: <span class="blue" onclick="magassag(${json.atlag});">${json.atlag}</span> cm`
+        }
+
+        async function minimum() {
+            let response = await fetch("http://localhost:88/magas?fx=min");
+            let json = await response.json();
+            document.getElementById("adatok").innerHTML = `Minimum magasság: <span class="blue" onclick="magassag(${json.min});">${json.min}</span> cm`
+        }
+
+        async function maximum() {
+            let response = await fetch("http://localhost:88/magas?fx=max");
+            let json = await response.json();
+            document.getElementById("adatok").innerHTML = `Maximum magasság: <span class="blue" onclick="magassag(${json.max});">${json.max}</span> cm`
+        }
+
+        async function magassag(magassag) {
+            let response = await fetch(`http://localhost:88/adat?magas=${magassag}`);
+            let json = await response.json();
+            adatIr(json);
+            document.getElementById("head").innerHTML = `Tornászok (magas=${json[0].magas})`
+        }
+
+        async function nem(nem) {
+            let response = await fetch(`http://localhost:88/adat?nem=${nem}`);
+            let json = await response.json();
+            adatIr(json);
+            document.getElementById("head").innerHTML = `Tornászok (nem=${json[0].nem})`
+        }
+
+        async function kor(kor) {
+            let response = await fetch(`http://localhost:88/adat?kor=${kor}`);
+            let json = await response.json();
+            adatIr(json);
+            document.getElementById("head").innerHTML = `Tornászok (kor=${json[0].kor})`
+        }
+
+        async function suly(suly) {
+            let response = await fetch(`http://localhost:88/adat?suly=${suly}`);
+            let json = await response.json();
+            adatIr(json);
+            document.getElementById("head").innerHTML = `Tornászok (kor=${json[0].suly})`
+        }
+
+        async function keres() {
+            let response = await fetch(`http://localhost:88/adat?nev=${document.getElementById("nev").value}`);
+            let json = await response.json();
+            document.getElementById("spNev").innerHTML = `${json[0].nev} [<span class="blue" onclick="nem('${json[0].nem}');">${json[0].nem}</span>], <span class="blue" onclick="kor(${json[0].kor});">${json[0].kor}</span> éves, <span class="blue" onclick="magassag(${json[0].magas});">${json[0].magas}</span> cm,  <span class="blue" onclick="suly(${json[0].suly});">${json[0].suly}</span> kg`
+        }
+
+        function adatIr(json) {
+            document.getElementById("tornaszok").innerHTML = "";
+            for (let i of json) {
+                document.getElementById("tornaszok").innerHTML += `${i.nev} [<span class="blue" onclick="nem('${i.nem}');">${i.nem}</span>], <span class="blue" onclick="kor(${i.kor});">${i.kor}</span> éves, <span class="blue" onclick="magassag(${i.magas});">${i.magas}</span> cm,  <span class="blue" onclick="suly(${i.suly});">${i.suly}</span> kg<br>`
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Magasság adatok</div>
+        <div class="content">
+            <input type="button" value="Átlag" onclick="atlag();">
+            <input type="button" value="Min" onclick="minimum();">
+            <input type="button" value="Max" onclick="maximum();">
+            <span id="adatok"></span>
+        </div>
+    </div>
+    <div class="container">
+        <div class="header">Név</div>
+        <div class="content">
+            <input type="text" id="nev"> <input type="button" value="Keresés" onclick="keres();"> <span id="spNev"></span>
+        </div>
+    </div>
+    <div class="container">
+        <div class="header" id="head">Tornászok ()</div>
+        <div class="content" id="tornaszok"></div>
+    </div>
+</body>
+</html>
